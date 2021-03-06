@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/koljapohl/movie_api.git"
+    "url": "git+https://github.com/vaishnavaohio/Movie-API.git"
   },
   "keywords": [
     "api",
@@ -17,17 +19,20 @@
   "author": "Kolja Pohl",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/koljapohl/movie_api/issues"
+    "url": "https://github.com/vaishnavaohio/Movie-API/issues"
   },
-  "homepage": "https://github.com/koljapohl/movie_api#readme",
+  "homepage": "https://github.com/vaishnavaohio/movie_api#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "mongoose": "^5.11.13",
     "morgan": "^1.10.0",
     "uuid": "^8.3.2"
+    
   },
   "devDependencies": {
-    "eslint": "^7.17.0"
+    "eslint": "^7.17.0",
+    "nodemon": "^2.0.7"
+
   }
 }
