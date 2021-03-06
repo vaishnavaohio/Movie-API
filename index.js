@@ -1,180 +1,190 @@
-const express = require("express");
-const morgan = require('morgan');
+const express = require('express'),
+morgan = require('morgan'),
+bodyParser = require('body-parser'),
+uuid = require('uuid'),
+mongoose = require('mongoose'),
+Models = require('./models.js');
 
 const app = express();
+const Movies = Models.Movie;
+const Users = Models.User;
 
-let topMovies = [{
-        title: 'Gone with the Wind',
-        stars: ['Clark Gable', 'Vivien Leigh'],
-        director: 'Victor Fleming',
-        bio: ['Born: February 23, 1889 in La Cañada, California, USA', 'Died: January 6, 1949 (age 59) in Cottonwood, Arizona, USA'],
-        year: 1939,
-        rating: 8.1,
-        genre: ['Drama', 'History', 'Romance', 'War'],
-        synopsis: 'A manipulative woman and a roguish man conduct a turbulent romance during the American Civil War and Reconstruction periods.'
-    },
-    {
-        title: 'The Sound of Music',
-        stars: ['Julie Andrews', 'Christopher Plummer'],
-        director: 'Robert Wise',
-        bio: ['Born: September 10, 1914 in Winchester, Indiana, USA', 'Died: September 14, 2005 (age 91) in Los Angeles, California, USA'],
-        year: 1965,
-        rating: 8.0,
-        genre: ['Romance', 'Musical', 'Family', 'Drama', 'Biography'],
-        synopsis: 'A woman leaves an Austrian convent to become a governess to the children of a Naval officer widower.'
-    },
-    {
-        title: 'Black Panther',
-        stars: ['Chadwick Boseman', 'Michael B. Jordan'],
-        director: 'Ryan Coogler',
-        bio: ['Born: May 23, 1986 in Oakland, California, USA'],
-        year: 2018,
-        rating: 7.3,
-        genre: ['Action', 'Adventure', 'SciFi'],
-        synopsis: 'Prince T\'Challa returns home to the reclusive, technologically advanced African nation of Wakanda to serve as his country\'s new king. However, T\'Challa soon finds that he is challenged for the throne from factions within his own country. When two foes conspire to destroy Wakanda, the hero known as Black Panther must team up with C.I.A. agent Everett K. Ross and members of the Dora Milaje, Wakandan special forces, to prevent Wakanda from being dragged into a world war. '
-    },
-    {
-        title: 'Pride & Prejudice',
-        stars: ['Keira Knightley', 'Matthew Macfadyen'],
-        director: 'Joe Wright',
-        bio: ['August 25, 1972 in London, England, UK'],
-        year: 2005,
-        rating: 7.8,
-        genre: ['Drama', 'Romance'],
-        synopsis: 'Sparks fly when spirited Elizabeth Bennet meets single, rich, and proud Mr. Darcy. But Mr. Darcy reluctantly finds himself falling in love with a woman beneath his class. Can each overcome their own pride and prejudice?'
-    },
-    {
-        title: 'The Lord of the Rings: The Fellowship of the Ring',
-        stars: ['Elijah Wood', 'Ian McKellen'],
-        director: 'Peter Jackson',
-        bio: ['Born: October 31, 1961 in Pukerua Bay, North Island, New Zealand'],
-        year: 2001,
-        rating: 8.8,
-        genre: ['Action', 'Adventure', 'Drama', 'Fantasy'],
-        synopsis: 'A meek Hobbit from the Shire and eight companions set out on a journey to destroy the powerful One Ring and save Middle-earth from the Dark Lord Sauron.'
-    },
-
-    {
-        title: 'Breakfast at Tiffany\'s',
-        stars: ['Audrey Hepburn'],
-        director: 'Blake Edwards',
-        bio: ['Born: July 26, 1922 in Tulsa, Oklahoma, USA', 'Died: December 15, 2010 (age 88) in Santa Monica, California, USA'],
-        year: 1961,
-        rating: 7.6,
-        genre: ['Comedy', 'Drama', 'Romance'],
-        synopsis: 'A young New York socialite becomes interested in a young man who has moved into her apartment building, but her past threatens to get in the way.'
-    },
-
-    {
-        title: 'The Lord of the Rings: The Two Towers',
-        stars: ['Elijah Wood', 'Ian McKellen'],
-        director: 'Peter Jackson',
-        bio: ['Born: October 31, 1961 in Pukerua Bay, North Island, New Zealand'],
-        year: 2002,
-        rating: 8.7,
-        genre: ['Action', 'Adventure', 'Drama', 'Fantasy'],
-        synopsis: 'While Frodo and Sam edge closer to Mordor with the help of the shifty Gollum, the divided fellowship makes a stand against Sauron\'s new ally, Saruman, and his hordes of Isengard.'
-    },
-
-    {
-        title: 'The Lord of the Rings: The Return of the King',
-        stars: ['Elijah Wood', 'Ian McKellen'],
-        director: 'Peter Jackson',
-        bio: ['Born: October 31, 1961 in Pukerua Bay, North Island, New Zealand'],
-        year: 2003,
-        rating: 8.9,
-        genre: ['Action', 'Adventure', 'Drama', 'Fantasy'],
-        synopsis: 'Gandalf and Aragorn lead the World of Men against Sauron\'s army to draw his gaze from Frodo and Sam as they approach Mount Doom with the One Ring.'
-    },
-
-    {
-        title: 'Der Untergang',
-        stars: ['Bruno Ganz', 'Alexandra Maria Lara', 'Ulrich Matthes'],
-        director: 'Oliver Hirschbiegel',
-        bio: ['Born: December 29, 1957 in Hamburg, Germany'],
-        year: 2003,
-        rating: 8.2,
-        genre: [' Biography', 'Drama', ' History', ' War'],
-        synopsis: 'In April of 1945, Germany stands at the brink of defeat with the Soviet Armies closing in from the west and south. In Berlin, capital of the Third Reich, Adolf Hitler proclaims that Germany will still achieve victory and orders his Generals and advisers to fight to the last man.'
-    },
-
-    {
-        title: 'Im Keller',
-        stars: ['Friz Lang', 'Manfred Ellinger', 'Alfreda Klebinger'],
-        director: 'Ulrich Seidl',
-        bio: ['Born: November 24, 1952 in Vienna, Austria'],
-        year: 2014,
-        rating: 6.7,
-        genre: 'Documentary',
-        synopsis: 'A documentary that reveals what its subjects do in their respective basements.'
-    }
-
-];
-let users = [{
-    username: 'User Name',
-    email: 'username@email.com'
-}];
+mongoose.connect('mongodb://localhost:27017/myFlixDB', { useNewUrlParser: true, useUnifiedTopology: true});
 
 app.use(morgan('common'));
-
-app.use('/documentation', express.static('public'));
-
-app.get('/', (req, res) => {
-    res.send('Welcome to my movie index');
-});
-
-app.get('/movies', (req, res) => {
-    res.json(topMovies);
-});
-
-app.get('/users', (req, res) => {
-    res.json(users)
-});
-
-
-app.get('/movies/title', (req, res) => {
-    res.json(topMovies.find((title) => {
-        return topMovies.title === req.params.title
-    }));
-});
-
-app.get('/movies/:title/genre', (req, res) => {
-    res.send('Successful GET request returning data on the details on one genre');
-});
-
-app.get('/movies/:director', (req, res) => {
-    res.send('Successful GET request returning data on the details on one director and his titles');
-});
-
-app.post('/users/:registration', (req, res) => {
-    res.send('Successful POST request updating user details');
-});
-
-app.put('/users/', (req, res) => {
-    res.send('Successful PUT request updating user details');
-});
-
-app.put('/users/:movies', (req, res) => {
-    res.send('Successful PUT request updating user details');
-});
-
-app.delete('/user/:title', (req, res) => {
-    res.send('Successful DELETE request deleting movie data from users favourites');
-});
-
-app.delete('/user/:user/:email', (req, res) => {
-    res.send('Successful DELETE request deleting the users email');
-});
-
-
 app.use(express.static('public'));
-
-
+app.use(bodyParser.json());
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
+    next();
+})
+
+app.get('/', (req, res) => {
+    console.log('Hi there!');
+    res.status(200).send('Welcome to myFlix!');
+});
+app.get('/movies', (req, res) => {
+Movies.find()
+    .then((movies) => {
+        res.status(200).json(movies);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
+});
+app.get('/movies/:Title', (req, res) => {
+    Movies.findOne({Title: req.params.Title})
+        .then((movie) => {
+            res.status(200).json(movie);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
+});
+app.get('/movies/genres/:Title', (req, res) => {
+    Movies.findOne({ 'Genre.Title': req.params.Title}, 'Genre')
+        .then((genre) => {
+            res.status(200).json(genre);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
+});
+app.get('/movies/directors/:Name', (req, res) => {
+    Movies.findOne({'Director.Name': req.params.Name}, 'Director')
+        .then((director) => {
+            res.status(200).json(director);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
 });
 
+app.post('/users', (req, res) => {
+    Users.findOne({ Username: req.body.Username })
+        .then((user) => {
+            if(user) {
+                return res.status(400).send(req.body.Username + ' already exists.');
+            } else {
+                Users
+                    .create({
+                        Username: req.body.Username,
+                        Password: req.body.Password,
+                        Email: req.body.Email,
+                        Birthday: req.body.Birthday
+                    })
+                    .then((user) => {res.status(201).json(user) })
+                    .catch((error) => {
+                        console.error(error);
+                        res.status(500).send('Error: ' + error);
+                    })
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: '+ error);
+        });
+    });
+
+    app.get('/users', (req,res) => {
+        Users.find()
+            .then((users) => {
+                res.status(200).json(users);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error: ' + err);
+            });
+    });
+
+    app.get('/users/:Username', (req, res) => {
+        Users.findOne({Username: req.params.Username})
+            .then((user) => {
+                res.status(200).json(user);
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send('Error: ' + err);
+            });
+    });
+
+app.put('/users/:Username', (req, res) => {
+    Users.findOneAndUpdate({Username: req.params.Username},
+        {
+            $set:
+            {
+                Username: req.body.Username,
+                Password: req.body.Password,
+                Email: req.body.Email,
+                Birthday: req.body.Birthday
+            }
+        },
+    { new: true, runValidators: true }) 
+        .then((updatedUser) => {
+            res.status(201).json(updatedUser);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
+    });
+
+app.post('/users/:Username/movies/:MovieID', (req, res) => {
+    Users.findOneAndUpdate({Username: req.params.Username},
+    {
+        $addToSet: {FavoriteMovies: req.params.MovieID }
+    })
+    .then(() => {
+        res.status(201).send(req.params.MovieID + ' was successfully added to ' + req.params.Username + '\'s list of favorites.');
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
+});
+app.delete('/users/:Username/movies/:MovieID', (req, res) => {
+    Users.findOneAndUpdate({Username: req.params.Username},
+        {
+            $pull: { FavoriteMovies: req.params.MovieID }
+        })
+        .then(() => {
+            res.status(200).send(req.params.MovieID + ' was successfully deleted from ' + req.params.Username + '\'s list of favorites.');
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
+});
+app.delete('/users/:Username', (req, res) => {
+    Users.findOneAndRemove({ Username: req.params.Username})
+        .then((user) => {
+            if(!user) {
+                res.status(400).send(req.params.Username + ' was not found.');
+            } else {
+                res.status(200).send(req.params.Username + ' was deleted.');
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
+});
+
+app.get('/movies/test/:MovieID', (req, res) => {
+    Movies.findById( req.params.MovieID, 'Title')
+        .then((movie) => {
+            res.status(200).send(movie.Title + ' and some more text.');
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
+});
 app.listen(8080, () => {
-    console.log('Your app is listening on port 8080.');
+    console.log('The app is listening on port 8080.');
 });
