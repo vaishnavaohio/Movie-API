@@ -1,46 +1,23 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const uuid = require("uuid");
-const morgan = require("morgan");
-const mongoose = require("mongoose");
-const Models = require("./models.js");
-const cors = require("cors");
-
-const { check, validationResult } = require("express-validator");
-
-
+const express = require("express"),
+  bodyParser = require("body-parser"),
+  uuid = require("uuid"),
+  morgan = require("morgan"),
+  mongoose = require("mongoose"),
+  Models = require("./models.js");
 
 const Movies = Models.Movie;
 const Users = Models.User;
 
-//This will connect from local client to local db
-/*mongoose.connect("mongodb://localhost:27017/myFlixDB", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});*/
-
-
-
-
-//This will connect from local client to heroku db
 mongoose.connect("mongodb://localhost:27017/myFlixDB", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
 
-//This will connect from heroku client to heroku db
-// mongoose.connect(process.env.CONNECTION_URI, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// });
-
 const app = express();
 
-app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use(morgan("common"));
-
 
 let auth = require("./auth.js")(app);
 
@@ -51,11 +28,13 @@ app.get("/", (req, res) => {
   res.send("Welcome to myFlix!");
 });
 
-app.get("/movies", passport.authenticate("jwt", { session: false }),
+app.get(
+  "/movies",
+  passport.authenticate("jwt", { session: false }),
   (req, res) => {
     Movies.find()
       .then(movies => {
-        res.status(200).json(movies);
+        res.status(201).json(movies);
       })
       .catch(err => {
         console.error(err);
@@ -71,7 +50,7 @@ app.get(
   (req, res) => {
     Movies.findOne({ Title: req.params.title })
       .then(movie => {
-        res.status(200).json(movie);
+        res.status(201).json(movie);
       })
       .catch(err => {
         console.error(err);
@@ -87,7 +66,7 @@ app.get(
   (req, res) => {
     Movies.findOne({ Title: req.params.title })
       .then(movie => {
-        res.status(200).json({
+        res.status(201).json({
           Genre: movie.Genre.Name,
           Description: movie.Genre.Description
         });
@@ -107,7 +86,7 @@ app.get(
     Movies.findOne({ "Director.Name": req.params.name })
       .then(movie => {
         console.log(movie);
-        res.status(200).json({
+        res.status(201).json({
           Name: movie.Director.Name,
           Bio: movie.Director.Bio,
           Birth: movie.Director.Birth,
@@ -124,25 +103,8 @@ app.get(
 //allow user to register an account
 app.post(
   "/users",
-  [
-    check("Username", "Username is required").isLength({ min: 5 }),
-    check(
-      "Username",
-      "Username contains non alphanumeric characters - not allowed."
-    ).isAlphanumeric(),
-    check("Password", "Password is required")
-      .not()
-      .isEmpty(),
-    check("Email", "Email does not appear to be valid").isEmail()
-  ],
+  //passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    let errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-    }
-
-    let hashedPassword = Users.hashPassword(req.body.Password);
     Users.findOne({ Username: req.body.Username })
       .then(user => {
         if (user) {
@@ -150,12 +112,12 @@ app.post(
         } else {
           Users.create({
             Username: req.body.Username,
-            Password: hashedPassword,
+            Password: req.body.Password,
             Email: req.body.Email,
             Birthday: req.body.Birthday
           })
             .then(user => {
-              res.status(200).json(user);
+              res.status(201).json(user);
             })
             .catch(error => {
               console.error(error);
@@ -177,7 +139,7 @@ app.get(
   (req, res) => {
     Users.find()
       .then(users => {
-        res.status(200).json(users);
+        res.status(201).json(users);
       })
       .catch(err => {
         console.error(err);
@@ -202,47 +164,31 @@ app.get(
   }
 );
 
-//allow user to update user details
+//allow user to update username
 app.put(
   "/users/:username",
-  [
-    check("Username", "Username is required").isLength({ min: 5 }),
-    check(
-      "Username",
-      "Username contains non alphanumeric characters - not allowed."
-    ).isAlphanumeric(),
-    check("Password", "Password is required")
-      .not()
-      .isEmpty(),
-    check("Email", "Email does not appear to be valid").isEmail()
-  ],
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    let errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-    }
-
-    let hashedPassword = Users.hashPassword(req.body.Password);
     Users.findOneAndUpdate(
-      { Username: req.params.Username },
+      { Username: req.params.username },
       {
         $set: {
           Username: req.body.Username,
-          Password: hashedPassword,
+          Password: req.body.Password,
           Email: req.body.Email,
           Birthday: req.body.Birthday
         }
       },
-      { new: true }
-    )
-      .then(updatedUser => {
-        res.status(200).json(updatedUser);
-      })
-      .catch(error => {
-        console.error(error);
-        res.status(500).send("Error: " + error);
-      });
+      { new: true },
+      (err, updatedUser) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Error: " + err);
+        } else {
+          res.json(updatedUser);
+        }
+      }
+    );
   }
 );
 
@@ -256,15 +202,16 @@ app.post(
       {
         $push: { FavoriteMovies: req.params.movieID }
       },
-      { new: true }
-    )
-      .then(updatedUser => {
-        res.status(200).json(updatedUser);
-      })
-      .catch(error => {
-        console.error(error);
-        res.status(500).send("Error: " + error);
-      });
+      { new: true },
+      (err, updatedUser) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Error: " + err);
+        } else {
+          res.json(updatedUser);
+        }
+      }
+    );
   }
 );
 
@@ -278,15 +225,16 @@ app.delete(
       {
         $pull: { FavoriteMovies: req.params.movieID }
       },
-      { new: true }
-    )
-      .then(updatedUser => {
-        res.status(200).json(updatedUser);
-      })
-      .catch(error => {
-        console.error(error);
-        res.status(500).send("Error: " + error);
-      });
+      { new: true },
+      (err, updatedUser) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Error: " + err);
+        } else {
+          res.json(updatedUser);
+        }
+      }
+    );
   }
 );
 
@@ -315,7 +263,4 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-const port = process.env.PORT || 8080;
-app.listen(port, "0.0.0.0", () => {
-  console.log("Listening on Port " + port);
-});
+app.listen(8080, () => console.log("Your app is listening on port 8080."));
