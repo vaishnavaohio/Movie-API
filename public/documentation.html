@@ -1,199 +1,158 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>myFlix_API</title>
-    <link rel="shortcut icon" href="#" type="image/x-icon">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="../css/styles.css">
-</head>
-<body>
- 
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=" />
+    <link rel="stylesheet" href="/style.css" />
+    <title>myFlix App</title>
+  </head>
+  <body>
+    <h1>myFlix App</h1>
+    <p>
+      This web application allows users to access information about different
+      movies, directors and genres.
+      <br />
+      Users are able to sign up, update their personal information and create a
+      list of their favorite movies.
+    </p>
+    <table>
+      <tr>
+        <th>Business Logic</th>
+        <th>URL</th>
+        <th>HTTP method</th>
+        <th>Req Body Format</th>
+        <th>Res Body Format</th>
+      </tr>
+      <tr>
+        <td>Get List of Movies</td>
+        <td>/movies/</td>
+        <td>GET</td>
+        <td>None</td>
+        <td>JSON object with all movie details</td>
+      </tr>
+      <tr>
+        <td>Get Information on a single movie by title</td>
+        <td>/movies/:title/</td>
+        <td>GET</td>
+        <td>None</td>
+        <td>
+          JSON object showing data on a single movie, ex: <br />{<br />
+          title: "",<br />
+          genre: "",<br />
+          description: "" ,<br />
+          director:{name: bio: birth-year: death-year: } ,<br />
+          image URL: "",<br />
+          feature: "yes/no"<br />
+          }
+        </td>
+      </tr>
+      <tr>
+        <td>Get data about a genre</td>
+        <td>/movies/genre/:title</td>
+        <td>GET</td>
+        <td>None</td>
+        <td>
+          Return description of movie by title, ex:
+          <br />
+          <br />[title] is a [genre] film about [description]
+        </td>
+      </tr>
+      <tr>
+        <td>Get information about a director by name</td>
+        <td>/movies/director/:name</td>
+        <td>GET</td>
+        <td>None</td>
+        <td>
+          JSON object with director information<br />
+          {<br />
+          name: "", <br />
+          bio: "", <br />
+          birth-year: "", <br />
+          death-year: "" <br />
+          }
+        </td>
+      </tr>
+      <tr>
+        <td>Allow user to register</td>
+        <td>/users</td>
+        <td>POST</td>
+        <td>
+          JSON object with user infromation<br />
+          {<br />
+          Username: [username]<br />
+          Password:[password]<br />
+          Email address: [email address]<br />
+          }
+        </td>
+        <td>
+          JSON object that returns user details<br />
+          {<br />
+          Username: "BMars101"<br />
+          Password: "*******" <br />
+          Email address: "beth.ellieday@gmail.com" <br />
+          }
+        </td>
+      </tr>
 
-</nav>
+      <tr>
+        <td>Allow user to update username</td>
+        <td>/users/:username</td>
+        <td>PUT</td>
+        <td>None</td>
+        <td>
+          send text message indicating username was successfully updated ex:
+          ":username was successfully updated"
+        </td>
+      </tr>
 
-<div class="container-fluid m-2">
-<div class="justify-content-center mt-5">
-    <h1 class="my-4">
-        Movie API Documentation
-    </h1>
-    <article>
-        <p>
-            This REST API is part of a web application that will provide users with access to information about different 
-            movies, directors, and genres. <br>
-            Users will be able to sign up, update their personal information, and create a list of their favorite movies.
-        </p>
-    </article>
-</div>
-<div class="justify-content-center">
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered table-hover table-striped">
-            <caption>List of API endpoints</caption>
-            <thead>
-                <tr>
-                    <th scope="col">Endpoint</th>
-                    <th scope="col">Business Logic</th>
-                    <th scope="col">HTTP Method</th>
-                    <th scope="col">Request body data format</th>
-                    <th scope="col">Response body data format</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">/</th>
-                    <td>Welcoming the client to the API</td>
-                    <td>GET</td>
-                    <td>None</td>
-                    <td>A text message welcoming the client to the API</td>
-                </tr>
-                <tr>
-                    <th scope="row">/movies</th>
-                    <td>Returns a list of all movies to the user</td>
-                    <td>GET</td>
-                    <td>None</td>
-                    <td>A JSON object holding data about all movies</td>
-                </tr>
-                <tr>
-                    <th scope="row">/movies/[Title]</th>
-                    <td>Returns data about a single movie by title to the user</td>
-                    <td>GET</td>
-                    <td>None</td>
-                    <td>A JSON object holding data about a single movie, containing the title,
-                        description, director, genre and image URL. Example:
-<pre><code>{
-    "Title": "Test Movie Title",
-    "Description": "Test Description",
-    "Director": {
-        "Name": "Test Director Name",
-        "Bio": "Test Bio",
-        "BirthYear": "Test Birthyear"
-    },
-    "Genre": {
-        "Title": "Test Genre",
-        "Description": "Test Genre Description"
-    },
-    "ImagePath": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/368px-Google_2015_logo.svg.png",
-    "Featured": true
-}</code></pre>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">movies/genres/[Title]</th>
-                    <td>Returns data about a genre by title</td>
-                    <td>GET</td>
-                    <td>None</td>
-                    <td>A JSON object holding data about a genre,
-                        containing the title and description. Example:
-<pre><code>{
-    "Title": "Drama",
-    "Description": "The drama genre features stories [...]"
-}</code></pre>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">movies/directors/[Name]</th>
-                    <td>Returns data about a director by name</td>
-                    <td>GET</td>
-                    <td>None</td>
-                    <td>A JSON object holding data about a director, containing
-                        the name, bio, birth year, death year. Example:
-<pre><code>{
-    "Name": "Christopher Nolan",
-    "Bio": "Christopher Edward Nolan CBE is a British-American [...]",
-    "BirthYear": "1970"
-}</code></pre>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">/users</th>
-                    <td>Allows a new user to register</td>
-                    <td>POST</td>
-                    <td>A JSON object holding data about the user to add, containing
-                        the username, password, email and date of birth. Example:
-<pre><code>{
-    "Username": "Ryan Twinsley",
-    "Password": "morethansafe",
-    "Email": "ryan.twinsley@somehost.com",
-    "Birthday": "1998-03-15"
-}</code></pre>
-                    </td>
-                    <td>A JSON object holding data about the user added, including an ID:
-<pre><code>{
-    "_id": "1",
-    "FavoriteMovies": [],
-    "Username": "Ryan Twinsley",
-    "Password": "morethansafe",
-    "Email": "ryan.twinsley@somehost.com",
-    "Birthday": "1998-03-15"
-}</code></pre>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">/users/[Username]</th>
-                    <td>Allows a user to update its user informations</td>
-                    <td>PUT</td>
-                    <td>A JSON object holding all data that is intended to be updated about that user (Username, Password and Email are always required!):
-<pre><code>{
-    "Username": "Ryan Twinsley",
-    "Password": "evenmorethansafe",
-    "Email": "ryan.twinsley@somehost.com",
-    "Birthday": "1998-03-15"
-}</code></pre>
-                    </td>
-                    <td>A JSON object holding all (updated and not updated) data about that user:
-<pre><code>{
-    "_id": "1",
-    "FavoriteMovies": [
-        "6009641fd0dd125620f809d3",
-        "60097045d0dd125620f809d9",
-        "6009709ad0dd125620f809da"
-    ],
-    "Username": "Ryan Twinsley",
-    "Password": "evenmorethansafe",
-    "Email": "ryan.twinsley@somehost.com",
-    "Birthday": "1998-03-15"
-}</code></pre>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">/users/[Username]/movies/[MovieID]</th>
-                    <td>Allows a user to add a movie to its list of favorites</td>
-                    <td>POST</td>
-                    <td>None</td>
-                    <td>A text message indicating whether the given movie was successfully added
-                        to the users list of favorites
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">/users/[Username]/movies/[MovieID]</th>
-                    <td>Allows a user to remove a movie from its list of favorites</td>
-                    <td>DELETE</td>
-                    <td>None</td>
-                    <td>A text message indicating whether the given movie was successfully deleted
-                        from the users list of favorites
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">/users/[Username]</th>
-                    <td>Allows an existing user to deregister</td>
-                    <td>DELETE</td>
-                    <td>None</td>
-                    <td>A text message indicating whether the user was deregistered successfully</td>
-                </tr>
-            </tbody>
-        </table>
-        <p>"/users/<strong>[Username]</strong>/movies/<strong>[MovieID]</strong>"<br>
-            Please note that within the given URL-endpoints, every fraction encountered by brackets are <strong><u>query parameters.</u></strong><br>
-            When setting a request to this endpoint, you need to adapt <strong>[Username]</strong> and  <strong>[MovieID]</strong>
-            to the corresponding <strong><em>:Username</em></strong> and <strong><em>:MovieID</em></strong>.</p>
-    </div>
-</div>
-</div>
+      <tr>
+        <td>Add a movie to movie list</td>
+        <td>users/:username/movies/:movieID</td>
+        <td>POST</td>
+        <td>
+          JSON object with movie details <br />{<br />
+          title: "",<br />
+          genre: "",<br />
+          description: "" ,<br />
+          director:{name: bio: birth-year: death-year: } ,<br />
+          image URL: "",<br />
+          feature: "yes/no"<br />
+          }
+        </td>
+        <td>
+          JSON object with the movie and details just added <br />{<br />
+          title: "",<br />
+          genre: "",<br />
+          description: "" ,<br />
+          director:{name: bio: birth-year: death-year: } ,<br />
+          image URL: "",<br />
+          feature: "yes/no"<br />
+          }
+        </td>
+      </tr>
+      <tr>
+        <td>Delete a movie from movie list</td>
+        <td>user/:username/movies/:movieID</td>
+        <td>DELETE</td>
+        <td>None</td>
+        <td>
+          Text message indicating the movie was successfully removed from list.
+          <br />
+          "movie was successfully removed from list."
+        </td>
+      </tr>
+      <tr>
+        <td>Allow user to deregister</td>
+        <td>/users/:username</td>
+        <td>DELETE</td>
+        <td>None</td>
+        <td>
+          text message indicating user successfully deregistered account<br />":username
+          successfully deregistered"
+        </td>
+      </tr>
+    </table>
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<!--<script src="dist/js/scripts.js"></script>-->
-</body>
+    <script src="index.js"></script>
+  </body>
 </html>

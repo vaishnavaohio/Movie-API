@@ -1,3 +1,4 @@
+//file to configure passport strategies
 const passport = require("passport"),
   LocalStrategy = require("passport-local").Strategy,
   Models = require("./models.js"),

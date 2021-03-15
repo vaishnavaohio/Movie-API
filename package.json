@@ -1,38 +1,39 @@
 {
   "name": "movie_api",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
-
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vaishnavaohio/Movie-API.git"
+    "url": "git+https://github.com/BMars101/movie_api.git"
   },
-  "keywords": [
-    "api",
-    "myFlix"
-  ],
-  "author": "Kolja Pohl",
-  "license": "MIT",
+  "keywords": [],
+  "author": "Beth",
+  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/vaishnavaohio/Movie-API/issues"
+    "url": "https://github.com/BMars101/movie_api/issues"
   },
-  "homepage": "https://github.com/vaishnavaohio/movie_api#readme",
+  "homepage": "https://github.com/BMars101/movie_api#readme",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.11.13",
+    "express-validator": "^6.6.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
+    "mongoose": "^5.10.13",
     "morgan": "^1.10.0",
-    "uuid": "^8.3.2"
-    
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "eslint": "^7.17.0",
-    "nodemon": "^2.0.7"
-
-  }
+    "eslint": "^7.12.0"
+  },
+  "description": "A movie API project"
 }
