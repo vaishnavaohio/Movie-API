@@ -4,7 +4,7 @@ const express = require("express"),
   morgan = require("morgan"),
   mongoose = require("mongoose"),
   Models = require("./models.js"),
-  //cors = require("cors");
+  cors = require("cors");
 
 const { check, validationResult } = require("express-validator");
 
@@ -25,7 +25,7 @@ mongoose.connect(process.env.CONNECTION_URI, {
 
 const app = express();
 
-//app.use(cors());
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("public"));
 app.use(morgan("common"));
