@@ -194,7 +194,7 @@ app.get(
 
 //allow user to update username
 app.put(
-  "/users/:username",
+  "/users/:Username",
   [
     check("Username", "Username is required").isLength({ min: 5 }),
     check(
